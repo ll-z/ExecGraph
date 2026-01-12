@@ -1,8 +1,10 @@
 ﻿using ExecGraph.Contracts.Common;
+using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Runtime.Debug;
 using ExecGraph.Runtime.Execution;
+using ExecGraph.Runtime.Validation;
 
 namespace ExecGraph.Runtime
 {
@@ -30,6 +32,7 @@ namespace ExecGraph.Runtime
             _graph = graph ?? throw new ArgumentNullException(nameof(graph));
             _runtimeNodes = runtimeNodes ?? throw new ArgumentNullException(nameof(runtimeNodes));
 
+            ValidateGraph(_graph);
             _controller = new ExecutionController();
             _debug = new DebugController();
             _scheduler = new Scheduler.Scheduler(_graph, _runtimeNodes, _controller, _debug, startNode: null);
@@ -41,6 +44,7 @@ namespace ExecGraph.Runtime
             _graph = graph ?? throw new ArgumentNullException(nameof(graph));
             _runtimeNodes = runtimeNodes ?? throw new ArgumentNullException(nameof(runtimeNodes));
 
+            ValidateGraph(_graph);
             _controller = controller ?? new ExecutionController();
             _debug = debug ?? new DebugController();
             _scheduler = new Scheduler.Scheduler(_graph, _runtimeNodes, _controller, _debug, startNode: null);
@@ -112,6 +116,12 @@ namespace ExecGraph.Runtime
         private void RebuildScheduler(NodeId? startNode)
         {
             _scheduler = new Scheduler.Scheduler(_graph, _runtimeNodes, _controller, _debug, startNode);
+        }
+
+        private static void ValidateGraph(GraphModel graph)
+        {
+            var validator = new GraphValidator();
+            validator.ValidateOrThrow(graph, DataTypeCompatibilityRegistry.Default);
         }
 
    

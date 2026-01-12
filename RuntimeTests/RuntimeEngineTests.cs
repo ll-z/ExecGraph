@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using ExecGraph.Contracts.Common;
+using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Trace;
 using ExecGraph.Contracts.Runtime;
@@ -34,8 +35,38 @@ namespace RuntimeTests
             {
                 Nodes = new[]
                 {
-                    new NodeModel { Id = idA, RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName! },
-                    new NodeModel { Id = idB, RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName! }
+                    new NodeModel
+                    {
+                        Id = idA,
+                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                        Ports = new[]
+                        {
+                            new PortMetadata
+                            {
+                                Name = "out",
+                                Direction = PortDirection.Output,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            }
+                        }
+                    },
+                    new NodeModel
+                    {
+                        Id = idB,
+                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                        Ports = new[]
+                        {
+                            new PortMetadata
+                            {
+                                Name = "in",
+                                Direction = PortDirection.Input,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            }
+                        }
+                    }
                 },
                 Links = new[]
                 {
@@ -98,9 +129,62 @@ namespace RuntimeTests
             {
                 Nodes = new[]
                 {
-            new NodeModel { Id = idA, RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName! },
-            new NodeModel { Id = idB, RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName! },
-            new NodeModel { Id = idC, RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName! }
+            new NodeModel
+            {
+                Id = idA,
+                RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                Ports = new[]
+                {
+                    new PortMetadata
+                    {
+                        Name = "out",
+                        Direction = PortDirection.Output,
+                        Kind = PortKind.Data,
+                        DataType = new DataTypeId("any"),
+                        IsSingle = false
+                    }
+                }
+            },
+            new NodeModel
+            {
+                Id = idB,
+                RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                Ports = new[]
+                {
+                    new PortMetadata
+                    {
+                        Name = "in",
+                        Direction = PortDirection.Input,
+                        Kind = PortKind.Data,
+                        DataType = new DataTypeId("any"),
+                        IsSingle = false
+                    },
+                    new PortMetadata
+                    {
+                        Name = "out",
+                        Direction = PortDirection.Output,
+                        Kind = PortKind.Data,
+                        DataType = new DataTypeId("any"),
+                        IsSingle = false
+                    }
+                }
+            },
+            new NodeModel
+            {
+                Id = idC,
+                RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                Ports = new[]
+                {
+                    new PortMetadata
+                    {
+                        Name = "in",
+                        Direction = PortDirection.Input,
+                        Kind = PortKind.Data,
+                        DataType = new DataTypeId("any"),
+                        IsSingle = false
+                    }
+                }
+            }
         },
                 Links = new[]
                 {

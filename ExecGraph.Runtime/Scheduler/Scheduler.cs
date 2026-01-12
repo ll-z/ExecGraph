@@ -112,7 +112,7 @@ namespace ExecGraph.Runtime.Scheduler
                     _controller.WaitIfNeeded();
                 }
 
-                current.Node.Execute(new RuntimeContext(current.Id, _dataStore, _trace));
+                current.Node.Execute(new RuntimeContext(current.Id, _dataStore, _trace, _controller.RunMode));
 
                 _trace.Emit(new ExecGraph.Contracts.Trace.NodeLeaveTrace { NodeId = current.Id });
 
@@ -121,6 +121,7 @@ namespace ExecGraph.Runtime.Scheduler
                 foreach (var nextId in current.Outgoing)
                 {
                     if (!_activeNodes.Contains(nextId)) continue;
+                    _trace.Emit(new FlowTrace(current.Id, nextId));
                     var next = _nodes[nextId];
                     next.InDegree--;
                     if (next.InDegree == 0)

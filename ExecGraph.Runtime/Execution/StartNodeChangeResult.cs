@@ -13,12 +13,4 @@ namespace ExecGraph.Runtime.Execution
         Pending,                 // 已经作为 pending 存储（编辑器可在 UI 展示）
         Rejected                 // 拒绝（例如参数无效）
     }
-
-    public enum ExecutionResetTrace
-    {
-        EpochFrom,                 // 立即应用（未运行或不危险）
-        EpochTo,   // 需要弹窗确认并重启
-        StartNode,                 // 已经作为 pending 存储（编辑器可在 UI 展示）
-        Reason                 // 拒绝（例如参数无效）
-    }
 }

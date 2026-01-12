@@ -35,11 +35,33 @@ namespace ExecGraph.Runtime
             _scheduler = new Scheduler.Scheduler(_graph, _runtimeNodes, _controller, _debug, startNode: null);
         }
 
+        // Default factory constructor - builds runtime nodes from graph models
+        public RuntimeHost(GraphModel graph, IRuntimeNodeFactory factory)
+        {
+            _graph = graph ?? throw new ArgumentNullException(nameof(graph));
+            _runtimeNodes = BuildRuntimeNodes(_graph, factory);
+
+            _controller = new ExecutionController();
+            _debug = new DebugController();
+            _scheduler = new Scheduler.Scheduler(_graph, _runtimeNodes, _controller, _debug, startNode: null);
+        }
+
         // Overload: allow injection of controller/debug for testing/diagnostics
         public RuntimeHost(GraphModel graph, IEnumerable<IRuntimeNode> runtimeNodes, ExecutionController controller, DebugController debug)
         {
             _graph = graph ?? throw new ArgumentNullException(nameof(graph));
             _runtimeNodes = runtimeNodes ?? throw new ArgumentNullException(nameof(runtimeNodes));
+
+            _controller = controller ?? new ExecutionController();
+            _debug = debug ?? new DebugController();
+            _scheduler = new Scheduler.Scheduler(_graph, _runtimeNodes, _controller, _debug, startNode: null);
+        }
+
+        // Overload: allow injection of controller/debug while using factory-based node creation
+        public RuntimeHost(GraphModel graph, IRuntimeNodeFactory factory, ExecutionController controller, DebugController debug)
+        {
+            _graph = graph ?? throw new ArgumentNullException(nameof(graph));
+            _runtimeNodes = BuildRuntimeNodes(_graph, factory);
 
             _controller = controller ?? new ExecutionController();
             _debug = debug ?? new DebugController();
@@ -167,6 +189,32 @@ namespace ExecGraph.Runtime
             if (!a.HasValue && !b.HasValue) return true;
             if (a.HasValue != b.HasValue) return false;
             return a!.Value.Equals(b!.Value);
+        }
+
+        private static IReadOnlyList<IRuntimeNode> BuildRuntimeNodes(GraphModel graph, IRuntimeNodeFactory factory)
+        {
+            if (factory is null) throw new ArgumentNullException(nameof(factory));
+
+            var nodes = graph.Nodes ?? Array.Empty<NodeModel>();
+            var results = new List<IRuntimeNode>(nodes.Count);
+            var ids = new HashSet<NodeId>();
+
+            foreach (var model in nodes)
+            {
+                if (!ids.Add(model.Id))
+                    throw new InvalidOperationException($"Duplicate NodeId '{model.Id}' found in graph model.");
+
+                var runtimeNode = factory.Create(model);
+                if (runtimeNode is null)
+                    throw new InvalidOperationException($"Factory returned null for node '{model.Id}'.");
+
+                if (!runtimeNode.Id.Equals(model.Id))
+                    throw new InvalidOperationException($"Runtime node id '{runtimeNode.Id}' does not match model id '{model.Id}'.");
+
+                results.Add(runtimeNode);
+            }
+
+            return results;
         }
     }
 }

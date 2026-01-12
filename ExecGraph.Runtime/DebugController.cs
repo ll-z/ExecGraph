@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ExecGraph.Contracts.Common;
 using ExecGraph.Contracts.Runtime;
 
@@ -9,8 +10,42 @@ namespace ExecGraph.Runtime.Debug
     {
         private readonly HashSet<NodeId> _breakpoints = new();
         private readonly object _sync = new();
+        private bool _isEnabled = true;
 
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled
+        {
+            get
+            {
+                lock (_sync)
+                {
+                    return _isEnabled;
+                }
+            }
+        }
+
+        public void Enable()
+        {
+            lock (_sync)
+            {
+                _isEnabled = true;
+            }
+        }
+
+        public void Disable()
+        {
+            lock (_sync)
+            {
+                _isEnabled = false;
+            }
+        }
+
+        public IReadOnlyCollection<NodeId> GetBreakpoints()
+        {
+            lock (_sync)
+            {
+                return _breakpoints.ToArray();
+            }
+        }
 
         public void AddBreakpoint(NodeId nodeId)
         {
@@ -38,12 +73,9 @@ namespace ExecGraph.Runtime.Debug
 
         public bool ShouldBreak(NodeId nodeId)
         {
-            if (!IsEnabled)
-                return false;
-
             lock (_sync)
             {
-                return _breakpoints.Contains(nodeId);
+                return _isEnabled && _breakpoints.Contains(nodeId);
             }
         }
     }

@@ -10,13 +10,15 @@ namespace ExecGraph.Runtime.VM
         private readonly NodeId _nodeId;
         private readonly DataStore _store;
         private readonly TraceEmitter _trace;
-        public RunMode RunMode => RunMode.Automatic;
+        private readonly RunMode _runMode;
+        public RunMode RunMode => _runMode;
 
-        internal RuntimeContext(NodeId nodeId, DataStore store, TraceEmitter trace)
+        internal RuntimeContext(NodeId nodeId, DataStore store, TraceEmitter trace, RunMode runMode)
         {
             _nodeId = nodeId;
             _store = store;
             _trace = trace;
+            _runMode = runMode;
         }
 
 

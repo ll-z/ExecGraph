@@ -3,6 +3,7 @@ using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Runtime.Debug;
 using ExecGraph.Runtime.Execution;
+using ExecGraph.Contracts.Trace;
 
 namespace ExecGraph.Runtime
 {
@@ -23,6 +24,7 @@ namespace ExecGraph.Runtime
         private NodeId? _currentStartNode;
         private NodeId? _pendingStartNode;
         private bool _isRunning;
+        private long _executionEpoch;
 
         // Default constructor - constructs its own controller/debug
         public RuntimeHost(GraphModel graph, IEnumerable<IRuntimeNode> runtimeNodes)
@@ -91,11 +93,15 @@ namespace ExecGraph.Runtime
         public void ConfirmPendingStartNodeAndRestart()
         {
             NodeId? pending;
+            long epochFrom;
+            long epochTo;
             lock (_sync)
             {
                 pending = _pendingStartNode;
                 if (pending == null) return;
                 _pendingStartNode = null;
+                epochFrom = _executionEpoch;
+                epochTo = ++_executionEpoch;
             }
 
             _controller.Pause();
@@ -106,6 +112,7 @@ namespace ExecGraph.Runtime
                 RebuildScheduler(_currentStartNode);
                 _state = ExecutionState.Idle;
             }
+            _scheduler.Trace.Emit(new ExecutionResetTrace(epochFrom, epochTo, _currentStartNode));
             StartScheduler();
         }
 

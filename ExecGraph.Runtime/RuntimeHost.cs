@@ -3,8 +3,6 @@ using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Runtime.Debug;
 using ExecGraph.Runtime.Execution;
-using ExecGraph.Runtime.Trace;
-using System.Diagnostics;
 
 namespace ExecGraph.Runtime
 {
@@ -59,11 +57,7 @@ namespace ExecGraph.Runtime
             lock (_sync)
             {
 
-                if (_controller.RunMode != RunMode.Development)
-                    return StartNodeChangeResult.Rejected;
-
-                
-
+      
                 if (NullableEquals(_currentStartNode, startNode) && _pendingStartNode == null)
                     return StartNodeChangeResult.Applied;
 
@@ -79,6 +73,9 @@ namespace ExecGraph.Runtime
                     _state = ExecutionState.PendingRestart;
                     return StartNodeChangeResult.RequireRestartConfirm;
                 }
+
+                if (_controller.RunMode != RunMode.Development)
+                    return StartNodeChangeResult.Rejected;
             }
         }
 

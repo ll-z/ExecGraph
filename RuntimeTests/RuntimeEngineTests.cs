@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Xunit;
 using ExecGraph.Contracts.Common;
 using ExecGraph.Contracts.Data;
+using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Trace;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Runtime;
-using ExecGraph.Runtime.Debug;
 
 namespace RuntimeTests
 {
@@ -35,6 +35,38 @@ namespace RuntimeTests
             {
                 Nodes = new[]
                 {
+                    new NodeModel
+                    {
+                        Id = idA,
+                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                        Ports = new[]
+                        {
+                            new PortMetadata
+                            {
+                                Name = "out",
+                                Direction = PortDirection.Output,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            }
+                        }
+                    },
+                    new NodeModel
+                    {
+                        Id = idB,
+                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                        Ports = new[]
+                        {
+                            new PortMetadata
+                            {
+                                Name = "in",
+                                Direction = PortDirection.Input,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            }
+                        }
+                    }
                     new NodeModel
                     {
                         Id = idA,
@@ -129,7 +161,7 @@ namespace RuntimeTests
             {
                 Nodes = new[]
                 {
-            new NodeModel
+             new NodeModel
             {
                 Id = idA,
                 RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,

@@ -12,7 +12,6 @@ using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Trace;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Runtime;
-using ExecGraph.Runtime.Debug;
 using ExecGraph.Runtime.Execution;
 
 namespace RuntimeTests

@@ -4,14 +4,14 @@ using System.Linq;
 using ExecGraph.Contracts.Common;
 using ExecGraph.Contracts.Runtime;
 
-namespace ExecGraph.Runtime.Debug
+namespace ExecGraph.Runtime
 {
     public sealed class DebugController : IDebugController
     {
         private readonly HashSet<NodeId> _breakpoints = new();
         private readonly object _sync = new();
-        private bool _isEnabled = true;
 
+        private bool _isEnabled = true;
         public bool IsEnabled
         {
             get
@@ -73,6 +73,8 @@ namespace ExecGraph.Runtime.Debug
 
         public bool ShouldBreak(NodeId nodeId)
         {
+            
+
             lock (_sync)
             {
                 return _isEnabled && _breakpoints.Contains(nodeId);

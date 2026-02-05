@@ -1,18 +1,16 @@
 ﻿// Tests/RuntimeTests/SchedulerStressTests.cs
-using System;
+
 using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
+
 using Xunit.Abstractions;
-using ExecGraph.Contracts.Common;
+
 using ExecGraph.Contracts.Graph;
-using ExecGraph.Contracts.Trace;
-using ExecGraph.Contracts.Runtime;
+
 using ExecGraph.Runtime;
 using ExecGraph.Runtime.Execution;
+using ExecGraph.Abstractions.Common;
+using ExecGraph.Runtime.Abstractions.Runtime;
+using ExecGraph.Abstractions.Trace;
 
 namespace RuntimeTests
 {
@@ -92,7 +90,7 @@ namespace RuntimeTests
             var go = new ManualResetEventSlim(false);       // start signal
 
             // Start runtime
-            controller.SetRunMode(ExecGraph.Contracts.Runtime.RunMode.Development);
+            controller.SetRunMode(RunMode.Development);
             var rtThread = new Thread(host.Start) { IsBackground = true };
             rtThread.Start();
 
@@ -190,7 +188,7 @@ namespace RuntimeTests
             int stepCalls = 0;
             var startGate = new CountdownEvent(stepThreads);
 
-            controller.SetRunMode(ExecGraph.Contracts.Runtime.RunMode.Development);
+            controller.SetRunMode(RunMode.Development);
             var rtThread = new Thread(host.Start) { IsBackground = true };
             rtThread.Start();
 

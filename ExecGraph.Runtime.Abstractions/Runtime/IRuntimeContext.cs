@@ -1,13 +1,10 @@
-﻿using ExecGraph.Contracts.Common;
-using ExecGraph.Contracts.Data;
-using ExecGraph.Contracts.Trace;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
-namespace ExecGraph.Contracts.Runtime
+using ExecGraph.Abstractions.Common;
+using ExecGraph.Abstractions.Data;
+using ExecGraph.Abstractions.Trace;
+
+namespace ExecGraph.Runtime.Abstractions.Runtime
 {
 
     // 用于标注运行时节点的特性（示例）
@@ -55,6 +52,4 @@ namespace ExecGraph.Contracts.Runtime
 
     }
 
-    // DataValue：不可变的数据单元，包含数据 + 类型 + 可选元数据
-    public sealed record DataValue(object? Value, DataTypeId TypeId, IReadOnlyDictionary<string, object?>? Meta = null);
-}
+ }

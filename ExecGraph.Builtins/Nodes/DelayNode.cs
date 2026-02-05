@@ -1,10 +1,9 @@
-﻿using ExecGraph.Builtins.Registration;
-using ExecGraph.Contracts.Common;
-using ExecGraph.Contracts.Data;
-using ExecGraph.Contracts.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
+
+using ExecGraph.Abstractions.Common;
+using ExecGraph.Abstractions.Data;
+using ExecGraph.Abstractions.Trace;
+using ExecGraph.Runtime.Abstractions.Runtime;
 
 namespace ExecGraph.Builtins.Nodes
 {
@@ -25,7 +24,7 @@ namespace ExecGraph.Builtins.Nodes
             Thread.Sleep(_ms);
 
             await ctx.SetOutputAsync("done", new DataValue(true, new DataTypeId("bool")));
-            ctx.EmitTrace(new ExecGraph.Contracts.Trace.NodeLeaveTrace() { NodeId=Id});
+            ctx.EmitTrace(new NodeLeaveTrace() { NodeId=Id});
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Xunit;
 using ExecGraph.Builtins.Nodes;
-using ExecGraph.Contracts.Common;
-using System.Linq;
+using ExecGraph.Abstractions.Common;
 
 public class ConcatNodeTests
 {

@@ -5,5 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+	<ItemGroup>
+		<!-- 作为向后兼容的 "contracts" thin-wrapper；通过 ProjectReference 转发类型 -->
+		<ProjectReference Include="..\ExecGraph.Abstractions\ExecGraph.Abstractions.csproj" />
+		<ProjectReference Include="..\ExecGraph.Runtime.Abstractions\ExecGraph.Runtime.Abstractions.csproj" />
+	</ItemGroup>
 </Project>

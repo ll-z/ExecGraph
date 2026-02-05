@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace ExecGraph.Contracts.Runtime
+namespace ExecGraph.Runtime.Abstractions.Runtime
 {
     public enum RunMode
     {

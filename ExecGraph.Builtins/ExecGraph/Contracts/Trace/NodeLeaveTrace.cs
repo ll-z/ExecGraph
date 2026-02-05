@@ -3,5 +3,5 @@ using ExecGraph.Abstractions.Trace;
 
 namespace ExecGraph.Contracts.Trace
 {
-    public sealed record FlowTrace(NodeId From, NodeId To) : TraceEvent;
+    internal record NodeLeaveTrace(NodeId NodeId) : TraceEvent;
 }

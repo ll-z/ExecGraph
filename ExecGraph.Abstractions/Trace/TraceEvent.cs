@@ -1,11 +1,7 @@
-﻿using ExecGraph.Contracts.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using ExecGraph.Abstractions.Common;
 
-namespace ExecGraph.Contracts.Trace
+namespace ExecGraph.Abstractions.Trace
 {
     public abstract record TraceEvent
     {

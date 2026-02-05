@@ -1,5 +1,7 @@
-﻿using ExecGraph.Contracts.Graph;
+﻿using ExecGraph.Abstractions.Common;
+using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Runtime;
+using ExecGraph.Runtime.Abstractions.Runtime;
 
 namespace ExecGraph.Runtime
 {
@@ -35,7 +37,7 @@ namespace ExecGraph.Runtime
                 if (ctorWithModel != null)
                     return (IRuntimeNode)ctorWithModel.Invoke(new object[] { model });
 
-                var ctorWithId = runtimeType.GetConstructor(new[] { typeof(ExecGraph.Contracts.Common.NodeId) });
+                var ctorWithId = runtimeType.GetConstructor(new[] { typeof(NodeId) });
                 if (ctorWithId != null)
                     return (IRuntimeNode)ctorWithId.Invoke(new object[] { model.Id });
 

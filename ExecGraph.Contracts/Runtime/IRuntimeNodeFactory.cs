@@ -1,4 +1,5 @@
 ﻿using ExecGraph.Contracts.Graph;
+using ExecGraph.Runtime.Abstractions.Runtime;
 
 namespace ExecGraph.Contracts.Runtime
 {

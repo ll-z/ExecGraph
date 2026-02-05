@@ -1,10 +1,10 @@
-﻿using ExecGraph.Builtins.Registration;
-using ExecGraph.Contracts.Common;
+﻿
+using ExecGraph.Abstractions.Common;
+using ExecGraph.Abstractions.Data;
+using ExecGraph.Abstractions.Trace;
 using ExecGraph.Contracts.Graph;
-using ExecGraph.Contracts.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using ExecGraph.Runtime.Abstractions.Runtime;
+
 
 namespace ExecGraph.Builtins.Nodes
 {
@@ -49,7 +49,7 @@ namespace ExecGraph.Builtins.Nodes
         public async ValueTask ExecuteAsync(IRuntimeContext ctx)
         {
             await ctx.SetOutputAsync("value", _value);
-            ctx.EmitTrace(new ExecGraph.Contracts.Trace.NodeLeaveTrace() { NodeId= Id });
+            ctx.EmitTrace(new NodeLeaveTrace() { NodeId= Id });
         }
     }
 }

@@ -1,11 +1,7 @@
-﻿using ExecGraph.Contracts.Common;
+﻿using ExecGraph.Abstractions.Common;
+using ExecGraph.Abstractions.Data;
 using ExecGraph.Contracts.Data;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ExecGraph.Contracts.Graph
 {

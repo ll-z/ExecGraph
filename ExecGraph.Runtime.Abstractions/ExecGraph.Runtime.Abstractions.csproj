@@ -5,13 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\ExecGraph.Contracts\ExecGraph.Contracts.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ExecGraph\" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<!-- 运行时抽象依赖数据抽象（DataValue/DataTypeId / NodeId） -->
+		<ProjectReference Include="..\ExecGraph.Abstractions\ExecGraph.Abstractions.csproj" />
+	</ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
-﻿using ExecGraph.Contracts.Common;
+﻿
+using ExecGraph.Abstractions.Common;
 using ExecGraph.Contracts.Graph;
 using System;
 using System.Collections.Generic;

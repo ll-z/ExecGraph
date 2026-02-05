@@ -1,7 +1,8 @@
-﻿using ExecGraph.Contracts.Common;
+﻿using ExecGraph.Abstractions.Common;
+using ExecGraph.Abstractions.Trace;
 using ExecGraph.Contracts.Graph;
-using ExecGraph.Contracts.Runtime;
 using ExecGraph.Contracts.Trace;
+using ExecGraph.Runtime.Abstractions.Runtime;
 using ExecGraph.Runtime.Execution;
 using ExecGraph.Runtime.Trace;
 using ExecGraph.Runtime.VM;
@@ -97,7 +98,7 @@ namespace ExecGraph.Runtime.Scheduler
                 // After wait, log continuing
                 Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss.ffff} [Scheduler] Proceeding to execute node {current.Id}");
 
-                _trace.Emit(new ExecGraph.Contracts.Trace.NodeEnterTrace { NodeId = current.Id });
+                _trace.Emit(new ExecGraph.Abstractions.Trace.NodeEnterTrace { NodeId = current.Id });
 
                 // Debug breakpoint
                 if (_controller.RunMode == RunMode.Development && _debug.ShouldBreak(current.Id))
@@ -113,7 +114,7 @@ namespace ExecGraph.Runtime.Scheduler
 
                 current.Node.ExecuteAsync(new RuntimeContext(current.Id, _dataStore, _trace, _controller.RunMode));
 
-                _trace.Emit(new ExecGraph.Contracts.Trace.NodeLeaveTrace { NodeId = current.Id });
+                _trace.Emit(new NodeLeaveTrace { NodeId = current.Id });
 
                 if (token.IsCancellationRequested) break;
 

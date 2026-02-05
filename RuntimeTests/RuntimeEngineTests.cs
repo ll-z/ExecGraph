@@ -1,11 +1,12 @@
-﻿using System.Collections.Concurrent;
-using ExecGraph.Contracts.Common;
-using ExecGraph.Contracts.Data;
+﻿using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Graph;
-using ExecGraph.Contracts.Trace;
-using ExecGraph.Contracts.Runtime;
 using ExecGraph.Runtime;
 using ExecGraph.Builtins.Nodes.Math;
+using ExecGraph.Abstractions.Common;
+using ExecGraph.Abstractions.Data;
+using ExecGraph.Runtime.Abstractions.Runtime;
+using ExecGraph.Abstractions.Trace;
+using System.Collections.Concurrent;
 
 namespace RuntimeTests
 {
@@ -242,7 +243,7 @@ namespace RuntimeTests
             };
 
             // Run automatic to completion
-            controller.SetRunMode(ExecGraph.Contracts.Runtime.RunMode.Automatic);
+            controller.SetRunMode(RunMode.Automatic);
             var rt = new Thread(host.Start) { IsBackground = true };
             rt.Start();
 

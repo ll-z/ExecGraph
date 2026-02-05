@@ -1,0 +1,27 @@
+{
+  "id": "ExecGraph.Builtins.Math.Sum",
+  "name": "Sum",
+  "description": "Adds two integers",
+  "ports": {
+    "inputs": [
+      {
+        "name": "a",
+        "type": "int",
+        "isSingle": true
+      },
+      {
+        "name": "b",
+        "type": "int",
+        "isSingle": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "sum",
+        "type": "int",
+        "isSingle": true
+      }
+    ]
+  },
+  "defaultParameters": {}
+}

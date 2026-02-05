@@ -5,6 +5,7 @@ using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Trace;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Runtime;
+using ExecGraph.Builtins.Nodes.Math;
 
 namespace RuntimeTests
 {
@@ -24,6 +25,7 @@ namespace RuntimeTests
         {
             var idA = NodeId.New();
             var idB = NodeId.New();
+            var idC = NodeId.New();
 
             var graph = new GraphModel
             {
@@ -62,10 +64,28 @@ namespace RuntimeTests
                         ]
                     },
 
+                    new NodeModel
+                    {
+                        Id = idC,
+                        RuntimeType = typeof(DoubleNode).AssemblyQualifiedName!,
+                        Ports =
+                        [
+                            new PortMetadata
+                            {
+                                Name = "in",
+                                Direction = PortDirection.Input,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            }
+                        ]
+                    },
+
                 ],
                 Links = new[]
                 {
-                    new LinkModel { FromNode = idA, FromPort = "out", ToNode = idB, ToPort = "in" }
+                    new LinkModel { FromNode = idA, FromPort = "out", ToNode = idB, ToPort = "in" },
+                    new LinkModel { FromNode = idA, FromPort = "out", ToNode = idC, ToPort = "in" }
                 }
             };
 

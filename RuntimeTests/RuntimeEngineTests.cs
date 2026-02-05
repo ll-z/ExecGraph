@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
+﻿using System.Collections.Concurrent;
 using ExecGraph.Contracts.Common;
-using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Graph;
 using ExecGraph.Contracts.Trace;
@@ -33,14 +27,14 @@ namespace RuntimeTests
 
             var graph = new GraphModel
             {
-                Nodes = new[]
-                {
+                Nodes =
+                [
                     new NodeModel
                     {
                         Id = idA,
                         RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
-                        Ports = new[]
-                        {
+                        Ports =
+                        [
                             new PortMetadata
                             {
                                 Name = "out",
@@ -49,14 +43,14 @@ namespace RuntimeTests
                                 DataType = new DataTypeId("any"),
                                 IsSingle = false
                             }
-                        }
+                        ]
                     },
                     new NodeModel
                     {
                         Id = idB,
                         RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
-                        Ports = new[]
-                        {
+                        Ports =
+                        [
                             new PortMetadata
                             {
                                 Name = "in",
@@ -65,41 +59,10 @@ namespace RuntimeTests
                                 DataType = new DataTypeId("any"),
                                 IsSingle = false
                             }
-                        }
-                    }
-                    new NodeModel
-                    {
-                        Id = idA,
-                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
-                        Ports = new[]
-                        {
-                            new PortMetadata
-                            {
-                                Name = "out",
-                                Direction = PortDirection.Output,
-                                Kind = PortKind.Data,
-                                DataType = new DataTypeId("any"),
-                                IsSingle = false
-                            }
-                        }
+                        ]
                     },
-                    new NodeModel
-                    {
-                        Id = idB,
-                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
-                        Ports = new[]
-                        {
-                            new PortMetadata
-                            {
-                                Name = "in",
-                                Direction = PortDirection.Input,
-                                Kind = PortKind.Data,
-                                DataType = new DataTypeId("any"),
-                                IsSingle = false
-                            }
-                        }
-                    }
-                },
+
+                ],
                 Links = new[]
                 {
                     new LinkModel { FromNode = idA, FromPort = "out", ToNode = idB, ToPort = "in" }
@@ -125,7 +88,7 @@ namespace RuntimeTests
                 if (tr is NodeEnterTrace ent2 && ent2.NodeId.Equals(idB)) tcsB.TrySetResult(true);
             };
 
-            controller.SetRunMode(ExecGraph.Contracts.Runtime.RunMode.Development);
+            controller.SetRunMode(RunMode.Development);
 
             var rtThread = new Thread(host.Start) { IsBackground = true };
             rtThread.Start();
@@ -159,70 +122,70 @@ namespace RuntimeTests
 
             var graph = new GraphModel
             {
-                Nodes = new[]
-                {
-             new NodeModel
-            {
-                Id = idA,
-                RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
-                Ports = new[]
-                {
-                    new PortMetadata
+                Nodes =
+                [
+                     new NodeModel
                     {
-                        Name = "out",
-                        Direction = PortDirection.Output,
-                        Kind = PortKind.Data,
-                        DataType = new DataTypeId("any"),
-                        IsSingle = false
-                    }
-                }
-            },
-            new NodeModel
-            {
-                Id = idB,
-                RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
-                Ports = new[]
-                {
-                    new PortMetadata
-                    {
-                        Name = "in",
-                        Direction = PortDirection.Input,
-                        Kind = PortKind.Data,
-                        DataType = new DataTypeId("any"),
-                        IsSingle = false
+                        Id = idA,
+                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                        Ports =
+                        [
+                            new PortMetadata
+                            {
+                                Name = "out",
+                                Direction = PortDirection.Output,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            }
+                        ]
                     },
-                    new PortMetadata
+                    new NodeModel
                     {
-                        Name = "out",
-                        Direction = PortDirection.Output,
-                        Kind = PortKind.Data,
-                        DataType = new DataTypeId("any"),
-                        IsSingle = false
-                    }
-                }
-            },
-            new NodeModel
-            {
-                Id = idC,
-                RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
-                Ports = new[]
-                {
-                    new PortMetadata
+                        Id = idB,
+                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                        Ports =
+                        [
+                            new PortMetadata
+                            {
+                                Name = "in",
+                                Direction = PortDirection.Input,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            },
+                            new PortMetadata
+                            {
+                                Name = "out",
+                                Direction = PortDirection.Output,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            }
+                        ]
+                    },
+                    new NodeModel
                     {
-                        Name = "in",
-                        Direction = PortDirection.Input,
-                        Kind = PortKind.Data,
-                        DataType = new DataTypeId("any"),
-                        IsSingle = false
+                        Id = idC,
+                        RuntimeType = typeof(FakeRuntimeNode).AssemblyQualifiedName!,
+                        Ports =
+                        [
+                            new PortMetadata
+                            {
+                                Name = "in",
+                                Direction = PortDirection.Input,
+                                Kind = PortKind.Data,
+                                DataType = new DataTypeId("any"),
+                                IsSingle = false
+                            }
+                        ]
                     }
-                }
-            }
-        },
-                Links = new[]
-                {
-            new LinkModel { FromNode = idA, FromPort = "out", ToNode = idB, ToPort = "in" },
-            new LinkModel { FromNode = idB, FromPort = "out", ToNode = idC, ToPort = "in" }
-        }
+                ],
+                Links =
+                [
+                    new LinkModel { FromNode = idA, FromPort = "out", ToNode = idB, ToPort = "in" },
+                    new LinkModel { FromNode = idB, FromPort = "out", ToNode = idC, ToPort = "in" }
+                ]
             };
 
             var nodes = new IRuntimeNode[]

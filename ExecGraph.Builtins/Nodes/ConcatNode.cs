@@ -1,14 +1,16 @@
-﻿
-
+﻿// ExecGraph.Builtins/Nodes/ConcatNode.cs
 using ExecGraph.Abstractions.Common;
 using ExecGraph.Abstractions.Data;
 using ExecGraph.Abstractions.Trace;
+
+using ExecGraph.Contracts.Trace;
 using ExecGraph.Runtime.Abstractions.Runtime;
+
 
 namespace ExecGraph.Builtins.Nodes
 {
     [RuntimeNode("Concat")]
-    public sealed class ConcatNode : IRuntimeNode
+    public sealed class ConcatNode : IExecutionNode
     {
         public NodeId Id { get; }
 
@@ -17,7 +19,6 @@ namespace ExecGraph.Builtins.Nodes
         private readonly bool _trim;
         private readonly bool _ignoreEmptyStrings;
 
-        // 从 NodeModel 创建的 factory 可以传入这些配置
         public ConcatNode(NodeId id, string separator = "", bool ignoreNulls = false, bool trim = false, bool ignoreEmptyStrings = false)
         {
             Id = id;
@@ -27,57 +28,65 @@ namespace ExecGraph.Builtins.Nodes
             _ignoreEmptyStrings = ignoreEmptyStrings;
         }
 
-        public async ValueTask ExecuteAsync(IRuntimeContext ctx)
+        public async ValueTask<ExecutionResult> ExecuteAsync(IRuntimeContext ctx)
         {
-            // 进入 trace
-            ctx.EmitTrace(new NodeEnterTrace { NodeId = Id });
-
-            // 首先优先 items
-            if (ctx.Inputs.TryGetValue("items", out var dvItems) && dvItems.Value is object itemsObj && !(itemsObj is string))
+            var traces = new List<TraceEvent> { new NodeEnterTrace { NodeId = Id } };
+            try
             {
-                var parts = CollectFromObject(itemsObj);
-                var result = Finalize(parts);
-                await ctx.SetOutputAsync("result", new DataValue(result, dvItems.TypeId));
-                ctx.EmitTrace(new NodeLeaveTrace { NodeId = Id });
-                return;
-            }
+                if (ctx.Inputs.TryGetValue("items", out var dvItems) && dvItems.Value is object itemsObj && !(itemsObj is string))
+                {
+                    var parts = CollectFromObject(itemsObj);
+                    var result = Finalize(parts);
+                    var outputs = new Dictionary<string, DataValue>
+                    {
+                        ["result"] = new DataValue(result, dvItems.TypeId)
+                    };
+                    traces.Add(new NodeLeaveTrace { NodeId = Id });
+                    return ExecutionResult.Ok(outputs, traces);
+                }
 
-            // 否则遍历所有 Inputs，按字典顺序（runtime 保证顺序或 NodeModel 中保证）
-            var allParts = new List<string>();
-            foreach (var kv in ctx.Inputs)
+                var allParts = new List<string>();
+                foreach (var kv in ctx.Inputs)
+                {
+                    var dv = kv.Value;
+                    if (dv.Value == null)
+                    {
+                        if (!_ignoreNulls) allParts.Add(string.Empty);
+                        continue;
+                    }
+
+                    if (dv.Value is string s)
+                    {
+                        allParts.Add(s);
+                        continue;
+                    }
+
+                    if (dv.Value is IEnumerable<string> se)
+                    {
+                        allParts.AddRange(se.Select(x => x ?? string.Empty));
+                        continue;
+                    }
+
+                    if (dv.Value is System.Collections.IEnumerable e)
+                    {
+                        foreach (var o in e) allParts.Add(o?.ToString() ?? string.Empty);
+                        continue;
+                    }
+
+                    allParts.Add(dv.Value.ToString() ?? string.Empty);
+                }
+
+                var final = Finalize(allParts);
+                var outp = new Dictionary<string, DataValue> { ["result"] = new DataValue(final, new DataTypeId("string")) };
+
+                traces.Add(new NodeLeaveTrace { NodeId = Id });
+                return ExecutionResult.Ok(outp, traces);
+            }
+            catch (Exception ex)
             {
-                var dv = kv.Value;
-                if (dv.Value == null)
-                {
-                    if (!_ignoreNulls) allParts.Add(string.Empty);
-                    continue;
-                }
-
-                if (dv.Value is string s)
-                {
-                    allParts.Add(s);
-                    continue;
-                }
-
-                // 如果是 string enumerable
-                if (dv.Value is IEnumerable<string> se)
-                {
-                    allParts.AddRange(se.Select(x => x ?? string.Empty));
-                    continue;
-                }
-
-                if (dv.Value is System.Collections.IEnumerable e)
-                {
-                    foreach (var o in e) allParts.Add(o?.ToString() ?? string.Empty);
-                    continue;
-                }
-
-                allParts.Add(dv.Value.ToString() ?? string.Empty);
+                traces.Add(new NodeErrorTrace { NodeId = Id, ErrorMessage = ex.Message, StackTrace = ex.StackTrace });
+                return ExecutionResult.Fail(ex);
             }
-
-            var final = Finalize(allParts);
-            await ctx.SetOutputAsync("result", new DataValue(final, new DataTypeId("string")));
-            ctx.EmitTrace(new NodeLeaveTrace { NodeId = Id });
         }
 
         private IEnumerable<string> CollectFromObject(object itemsObj)

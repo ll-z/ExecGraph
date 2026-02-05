@@ -43,8 +43,12 @@ namespace ExecGraph.Runtime.Abstractions.Runtime
         // 流式输出（可用于逐条发送、长流）
         ValueTask WriteOutputStreamAsync(string portName, IAsyncEnumerable<DataValue> stream, CancellationToken ct = default);
 
+        // interface IRuntimeContext 里新增：
+        /// <summary>
+        /// 将节点的 outputs 原子地提交到 runtime（runtime 负责校验 port/类型、触发后续节点等）。
+        /// </summary>
+        ValueTask CommitOutputsAsync(IReadOnlyDictionary<string, DataValue> outputs, CancellationToken cancellationToken = default);
 
-      
         void EmitTrace(TraceEvent trace);
         // 运行时可扩展属性（键-值）
         IReadOnlyDictionary<string, object?> Properties { get; }

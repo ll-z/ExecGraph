@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ExecGraph\" />
+    <Folder Include="ExecGraph\Contracts\Data\" />
   </ItemGroup>
 
 </Project>

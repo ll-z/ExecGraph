@@ -8,21 +8,25 @@ using System.Collections.ObjectModel;
 
 public class TestRuntimeContext : IRuntimeContext
 {
-    public NodeId NodeId { get; }
-    public RunMode RunMode { get; set; } = RunMode.Automatic;
+    public NodeId NodeId { get; init; } = NodeId.New();
+    public RunMode RunMode { get; init; } = RunMode.Development;
 
     public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
-    public TimeSpan? DeadlineRemaining { get; }
-    public IServiceProvider Services { get; } = null!;
+    public TimeSpan? DeadlineRemaining => null;
+    public IServiceProvider Services { get; init; } = null!;
     public IReadOnlyDictionary<string, DataValue> Inputs { get; private set; } = new ReadOnlyDictionary<string, DataValue>(new Dictionary<string, DataValue>());
     public IReadOnlyDictionary<string, object?> Properties { get; } = new ReadOnlyDictionary<string, object?>(new Dictionary<string, object?>());
     public List<TraceEvent> Traces { get; } = new();
-
+    private readonly Dictionary<string, DataValue> _outputs = new();
     public Dictionary<string, DataValue> Outputs { get; } = new();
 
     public TestRuntimeContext(NodeId id) => NodeId = id;
-
+    public ValueTask SetOutputAsync(string portName, DataValue value)
+    {
+        _outputs[portName] = value;
+        return ValueTask.CompletedTask;
+    }
     public void SetInputs(params (string name, object? value)[] pairs)
     {
         var dict = new Dictionary<string, DataValue>();
@@ -44,24 +48,33 @@ public class TestRuntimeContext : IRuntimeContext
 
     public void EmitTrace(TraceEvent ev) { Traces.Add(ev); }
 
-    public async ValueTask SetOutputAsync(string portName, DataValue value)
-    {
-        Outputs[portName] = value;
-        await Task.CompletedTask;
-    }
+
 
     public ValueTask WriteOutputStreamAsync(string portName, IAsyncEnumerable<DataValue> stream, CancellationToken ct = default)
     {
-        // testing helper: collect stream to Outputs as array
-        _ = Task.Run(async () =>
+        // 测试实现可以选择 materialize，或记录流对象
+        var list = new List<DataValue>();
+        var enumerator = stream.GetAsyncEnumerator(ct);
+        // 注意：在测试环境避免长时间等待；此处给出简化做法
+        while (enumerator.MoveNextAsync().AsTask().Result)
         {
-            var list = new List<DataValue>();
-            await foreach (var item in stream.WithCancellation(ct))
-            {
-                list.Add(item);
-            }
-            Outputs[portName] = new DataValue(list.ToArray(), new DataTypeId("array"));
-        }, ct);
+            list.Add(enumerator.Current);
+        }
+        _outputs[portName] = new DataValue(list.AsReadOnly(), new DataTypeId("stream"));
         return ValueTask.CompletedTask;
+    }
+
+
+
+    // 新增接口实现：
+    public async ValueTask CommitOutputsAsync(IReadOnlyDictionary<string, DataValue> outputs, CancellationToken cancellationToken = default)
+    {
+        if (outputs == null || outputs.Count == 0) return;
+        foreach (var kv in outputs)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            _outputs[kv.Key] = kv.Value;
+            await Task.CompletedTask;
+        }
     }
 }

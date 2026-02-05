@@ -111,11 +111,13 @@ public sealed class RuntimeContext : IRuntimeContext
         _store.SetOutput(_nodeId, portName, value);
 
         // 发 DataWriteTrace
-        _trace.Emit(new DataWriteTrace
+        _trace.Emit(new IOTrace
         {
-            NodeId = _nodeId,
-            Port = portName,
-            Value = value
+            NodeId = NodeId,
+            Outputs = new Dictionary<string, DataValue>
+            {
+                [portName] = value
+            }
         });
     }
 
@@ -149,18 +151,26 @@ public sealed class RuntimeContext : IRuntimeContext
             // 如果创建失败（极少见），仍然使用 ct
             linked = ct;
         }
+        var buffer = new List<DataValue>();
 
         await foreach (var dv in stream.WithCancellation(linked).ConfigureAwait(false))
         {
-            // 这里逐项写入 DataStore；如果后续有优化可批量/流式路由
             _store.SetOutput(_nodeId, portName, dv);
-            _trace.Emit(new DataWriteTrace
-            {
-                NodeId = _nodeId,
-                Port = portName,
-                Value = dv
-            });
+            buffer.Add(dv);
         }
+
+        // 一次性 emit trace（语义：这个节点在该 port 输出了一批数据）
+        _trace.Emit(new IOTrace
+        {
+            NodeId = _nodeId,
+            Outputs = new Dictionary<string, DataValue>
+            {
+                [portName] = new DataValue(
+                    buffer.AsReadOnly(),
+                    new DataTypeId("stream")
+                )
+            }
+        });
     }
 
     /// <summary>
@@ -175,5 +185,19 @@ public sealed class RuntimeContext : IRuntimeContext
     {
         if (trace == null) throw new ArgumentNullException(nameof(trace));
         _trace.Emit(trace);
+    }
+
+    public async ValueTask CommitOutputsAsync(IReadOnlyDictionary<string, DataValue> outputs, CancellationToken cancellationToken = default)
+    {
+        if (outputs == null || outputs.Count == 0) return;
+
+        // 若需要原子性，可以考虑加锁或使用事务性写入底层 graph 存储。
+        // 这里使用逐个写入的保守实现，保持和旧 SetOutputAsync 行为一致。
+        foreach (var kv in outputs)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            // 这里调用现有的 SetOutputAsync（请确保该方法在本类或接口中存在）
+            await SetOutputAsync(kv.Key, kv.Value).ConfigureAwait(false);
+        }
     }
 }

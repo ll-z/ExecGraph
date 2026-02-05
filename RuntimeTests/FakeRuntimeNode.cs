@@ -24,7 +24,7 @@ namespace RuntimeTests
         }
 
         // <-- EXACT signature required by Contracts
-        public void Execute(IRuntimeContext ctx)
+        public async ValueTask ExecuteAsync(IRuntimeContext ctx)
         {
             // Emit enter/leave traces so tests can observe behavior
             ctx.EmitTrace(new NodeEnterTrace { NodeId = Id });

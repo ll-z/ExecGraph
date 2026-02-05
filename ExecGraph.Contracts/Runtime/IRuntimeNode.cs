@@ -10,6 +10,6 @@ namespace ExecGraph.Contracts.Runtime
     public interface IRuntimeNode
     {
         NodeId Id { get; }
-        void Execute(IRuntimeContext context);
+        ValueTask ExecuteAsync(IRuntimeContext ctx);
     }
 }

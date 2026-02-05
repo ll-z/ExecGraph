@@ -1,4 +1,5 @@
 ﻿using ExecGraph.Contracts.Common;
+using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Contracts.Trace;
 
@@ -11,7 +12,7 @@ namespace ExecGraph.Builtins.Nodes.Math
         public DoubleNode(NodeId id) => Id = id;
 
         // 必须精确匹配 Contracts 中的签名
-        public void Execute(IRuntimeContext ctx)
+        public async ValueTask ExecuteAsync(IRuntimeContext ctx)
         {
             // 发出进入 trace（可选，方便调试 / 测试）
             ctx.EmitTrace(new NodeEnterTrace { NodeId = Id });
@@ -24,7 +25,8 @@ namespace ExecGraph.Builtins.Nodes.Math
 
             // 写出到名为 "out" 的输出端口
             // RuntimeContext.SetOutput 会负责把值路由到下游输入且自动发 DataWriteTrace
-            ctx.SetOutput("out", output);
+            //ctx.SetOutput("out", output);
+            await ctx.SetOutputAsync("out", new DataValue(output, new DataTypeId("int")));
 
             // 发出离开 trace（可选）
             ctx.EmitTrace(new NodeLeaveTrace { NodeId = Id });

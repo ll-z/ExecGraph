@@ -1,5 +1,6 @@
 ﻿using ExecGraph.Builtins.Registration;
 using ExecGraph.Contracts.Common;
+using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Contracts.Trace;
 using System;
@@ -18,7 +19,7 @@ namespace ExecGraph.Builtins.Nodes.Math
         // 约定：使用 NodeId 构造
         public SumNode(NodeId id) => Id = id;
 
-        public void Execute(IRuntimeContext ctx)
+        public async ValueTask ExecuteAsync(IRuntimeContext ctx)
         {
             // 发 enter trace（方便测试 / 调试）
             ctx.EmitTrace(new NodeEnterTrace { NodeId = Id });
@@ -28,8 +29,8 @@ namespace ExecGraph.Builtins.Nodes.Math
             var sum = a + b;
 
             // SetOutput 将把值路由到所有下游并自动发布 DataWriteTrace（RuntimeContext 实现负责）
-            ctx.SetOutput("sum", sum);
-
+            //ctx.SetOutput("sum", sum);
+            await ctx.SetOutputAsync("sum", new DataValue(sum, new DataTypeId("int")));
             ctx.EmitTrace(new NodeLeaveTrace { NodeId = Id });
         }
     }

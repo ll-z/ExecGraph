@@ -111,7 +111,7 @@ namespace ExecGraph.Runtime.Scheduler
                     _controller.WaitIfNeeded();
                 }
 
-                current.Node.Execute(new RuntimeContext(current.Id, _dataStore, _trace, _controller.RunMode));
+                current.Node.ExecuteAsync(new RuntimeContext(current.Id, _dataStore, _trace, _controller.RunMode));
 
                 _trace.Emit(new ExecGraph.Contracts.Trace.NodeLeaveTrace { NodeId = current.Id });
 

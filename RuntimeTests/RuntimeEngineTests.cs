@@ -92,7 +92,8 @@ namespace RuntimeTests
             var nodes = new IRuntimeNode[]
             {
                 new FakeRuntimeNode(idA, "A", 50),
-                new FakeRuntimeNode(idB, "B", 50)
+                new FakeRuntimeNode(idB, "B", 50),
+                 new DoubleNode(idC)
             };
 
             var host = new RuntimeHost(graph, nodes);

@@ -1,4 +1,5 @@
 ﻿using ExecGraph.Contracts.Common;
+using ExecGraph.Contracts.Data;
 using ExecGraph.Contracts.Runtime;
 using ExecGraph.Contracts.Trace;
 //using Serilog;
@@ -19,7 +20,7 @@ namespace ExecGraph.Runtime.Test
             Id = id;
         }
 
-        public void Execute(IRuntimeContext ctx)
+        public async ValueTask ExecuteAsync(IRuntimeContext ctx)
         {
             //Log.Information($"[EXECUTE] Node {Id}");
 
@@ -38,10 +39,11 @@ namespace ExecGraph.Runtime.Test
         public NodeA(NodeId id) => Id = id;
 
 
-        public void Execute(IRuntimeContext ctx)
+        public async ValueTask ExecuteAsync(IRuntimeContext ctx)
         {
-            ctx.SetOutput("out", 42);
-           // Log.Information("NodeA -> out = 42");
+            //ctx.SetOutput("out", 42);
+            await ctx.SetOutputAsync("out", new DataValue(42, new DataTypeId("int")));
+            // Log.Information("NodeA -> out = 42");
             ctx.EmitTrace(new NodeEnterTrace());
         }
         
@@ -55,7 +57,7 @@ namespace ExecGraph.Runtime.Test
         public NodeB(NodeId id) => Id = id;
 
 
-        public void Execute(IRuntimeContext ctx)
+        public async ValueTask ExecuteAsync(IRuntimeContext ctx)
         {
             var v = ctx.GetInput<int>("in");
            // Log.Information($"NodeB <- in = {v}");
